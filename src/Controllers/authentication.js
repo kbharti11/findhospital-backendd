@@ -1,21 +1,28 @@
 const users = require("../Models/users")
 const jwt=require("jsonwebtoken")
 
-exports.register = async (req,res) =>{
+exports.register = async (req,res,next) =>{
     const{ name, number ,email,password } = req.body
     
     const _user = new users({name,number,email, password})
     const eUser = await users.findOne({email})
     if(!eUser){
         _user.save().then(newuser => {
-            return  res.status(201).json({newuser, message:"Account Created"})
-          }).catch(error=>{
-              return res.status(400).json({error,message:"Error Occurred"})
+            req.subject = "User Registration"
+            req.text = "You have successfully signed up"
+            next()
+            // return  res.status(201).json({newuser, message:"Account Created"})
+          }).
+          catch(error=>{
+              return res.status(400).json({
+                message:"Error Occurred",
+                error
+            });
       
-          })
+          });
 
     }else{
-        return res.status(400).json({message:"Account already exists"})
+        return res.status(200).json({message:"Account already exists"})
     }
 // to save
    

@@ -1,4 +1,5 @@
 const jwt=require("jsonwebtoken")
+const {check , validationResult} = require("express-validator")
 exports.verifyToken =(req,res,next)=>{
     try {
       const token =req.headers.authorization 
@@ -17,3 +18,24 @@ exports.verifyToken =(req,res,next)=>{
         
     }
 }
+
+exports.validateForm = [
+
+  check("name").notEmpty().withMessage("Please Enter Name"),
+  check("number").isMobilePhone().withMessage("Please Enter valid number"),
+  check("email").isEmail().withMessage("Please Enter email"),
+  check("message").notEmpty().withMessage("Please Enter message"),
+  check("interest").notEmpty().withMessage("Please Enter interest")
+
+]
+
+exports.isValidated = (req,res,next)=>{
+  const errors = validationResult(req)
+
+  if(errors.isEmpty()){
+    next()
+  }else{
+    res.status(400).json({message:errors.array()[0]})
+  }
+}
+
